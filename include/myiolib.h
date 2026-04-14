@@ -1,7 +1,9 @@
 
 
 //myiolib.h
-//This library was created by Creed Truman. This is my first version in VSCode!
+//This library was created by Creed Truman.
+//It was created for Sudeepa Pathak's EGR-150-AF01 Class in Spring 2026.
+//This library is licensed under the MIT License.
 //This version was last updated on 4/14/2026.
 
 //Credit to Google Gemini for helping me debug and optimize the code, for explaining AVR architecture, and helping me get started with VSCode.
@@ -72,15 +74,21 @@ inline void myDigitalWrite(const PinStruct target, bool level){
   else  *target.port &= ~(1 << target.bit);
 }
 inline void myAnalogWrite(const PinStruct target, uint8_t level){
-    *target.PWMData.PWMPtr = level;
+    if(target.PWMData.timer != nullptr){
+        *target.PWMData.PWMPtr = level;
+    }
 }
 
 
 inline void enablePWM(const PinStruct target){
-    *target.PWMData.timer |= (1 << target.PWMData.modeBit);
+    if(target.PWMData.timer != nullptr){
+        *target.PWMData.timer |= (1 << target.PWMData.modeBit);
+    }
 }
 inline void disablePWM(const PinStruct target){
-    *target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
+    if(target.PWMData.timer != nullptr){
+        *target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
+    }
 }
 
 
