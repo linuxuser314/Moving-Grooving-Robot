@@ -1,7 +1,8 @@
 
+
 //myiolib.h
 //This library was created by Creed Truman. This is my first version in VSCode!
-//This version was last updated on 4/13/2026.
+//This version was last updated on 4/14/2026.
 
 //Credit to Google Gemini for helping me debug and optimize the code, for explaining AVR architecture, and helping me get started with VSCode.
 
@@ -11,10 +12,6 @@
 //It is not fully functional by any means.
 
 //TODO:
-//Fully define all pins
-//Seperate the digital and analog write functions with enable/disable PWM functions to reduce overhead
-//Clean up the code and comments
-//Add servo control functions
 //Add serial IO functions
 
 //This is necessary for IO port definitions, interrupt handling, and uint8_t
@@ -36,11 +33,9 @@ struct PinStruct{
   PWMStruct PWMData;
 };
 
-//Bit Bucket
-uint8_t bitBucket = 0;
 
 //Placeholder
-constexpr PWMStruct NO_PWM = {0, &bitBucket, &bitBucket};
+constexpr PWMStruct NO_PWM = {0, nullptr, nullptr};
 
 //This is where I will define the pin constants. I am using the PinStruct to store all necessary information about each pin in one place, which should make it easier to write generic functions for pin manipulation and PWM control.
 //I do not have PWM set up for all pins just yet, so I am using the NO_PWM for those pins (3, 9, 10, 11).
@@ -65,6 +60,30 @@ constexpr uint8_t OFF = 0;
 constexpr uint8_t IN = 0;
 constexpr uint8_t OUT = 1;
 
+inline bool myDigitalRead(const PinStruct target){
+  return *target.pin & (1 << target.bit);
+}
+inline void myPinMode(const PinStruct target, bool mode){
+  if(mode)	*target.ddr |= (1 << target.bit);
+  else	*target.ddr &= ~(1 << target.bit);
+}
+inline void myDigitalWrite(const PinStruct target, bool level){
+  if(level)	*target.port |= (1 << target.bit);
+  else  *target.port &= ~(1 << target.bit);
+}
+inline void myAnalogWrite(const PinStruct target, uint8_t level){
+    *target.PWMData.PWMPtr = level;
+}
+
+
+inline void enablePWM(const PinStruct target){
+    *target.PWMData.timer |= (1 << target.PWMData.modeBit);
+}
+inline void disablePWM(const PinStruct target){
+    *target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
+}
+
+
 //defines the functions necessary for setting up, running, and updating myMillis().
 volatile unsigned long systemMillis = 0;
 ISR(TIMER2_COMPA_vect){
@@ -87,37 +106,6 @@ inline void initTimer2Millis(void){
   sei();
 }
 
-inline bool myDigitalRead(const PinStruct target){
-  return *target.pin & (1 << target.bit);
-}
-
-inline void myPinMode(const PinStruct target, bool mode){
-  if(mode)	*target.ddr |= (1 << target.bit);
-  else	*target.ddr &= ~(1 << target.bit);
-}
-
-inline void myDigitalWrite(const PinStruct target, bool level){
-  if(level)	*target.port |= (1 << target.bit);
-  else  *target.port &= ~(1 << target.bit);
-}
-inline void myAnalogWrite(const PinStruct target, uint8_t level){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.PWMPtr = level;
-    }
-}
-
-inline void enablePWM(const PinStruct target){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.timer |= (1 << target.PWMData.modeBit);
-    }
-}
-inline void disablePWM(const PinStruct target){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
-    }
-}
-
-
 //this initiates Timer0 PWM for pins 5 and 6.
 inline void initTimer0PWM(void){
 	//Sets Pins 5 and 6 Waveform Generation Mode to Mode 3: Fast PWM
@@ -129,8 +117,8 @@ inline void initTimer0PWM(void){
 //This initiates Timer1 for 50Hz servo control.
 inline void initTimer1Servo50Hz(void){
 
-
-	DDRB |= (1 << 1) | (1 << 2); //Set pins 9 and 10 as outputs for servo control
+	myPinMode(PIN_9, OUT);
+	myPinMode(PIN_10, OUT);
 
 	//Setting the Waveform Generation Module to Mode 14: Fast PWM with ICR1 as TOP.
 	//This allows us to set a custom TOP value for a specific PWM frequency, which is necessary for accurate servo control.
@@ -154,11 +142,16 @@ inline void initTimer1Servo50Hz(void){
 
 }
 
+//Primary robot drive function
 inline void drive(int8_t left, int8_t right){
-	//Drives the robot so that at 1.3ms the motors are still
-	//then we add/sub a number between [-100,100] to control the speed of the motors between 1.3ms and 1.7ms
-	OCR1A = 3000 + left * 4;
-	OCR1B = 3000 - right * 4;
+	//Drives the robot.
+	//It starts by taking 3000 (1.5ms).
+	//Then it takes the left and right variables (which range from -100 to 100) and multiplies them by 4.
+	//This gives us a range from -400 to 400.
+	//Adding them to the 3000 gives us a range from 2600 to 3400, or 1.3ms to 1.7ms to control the servos.
+	//The right motor is reversed because of the way it is oriented on the robot.
+	OCR1A = 3000 + (uint16_t)left * 4;
+	OCR1B = 3000 - (uint16_t)right * 4;
 }
 
 inline void myDelay(unsigned long ms){
