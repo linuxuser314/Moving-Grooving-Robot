@@ -60,6 +60,25 @@ constexpr uint8_t OFF = 0;
 constexpr uint8_t IN = 0;
 constexpr uint8_t OUT = 1;
 
+void initSerial9600(void){
+	//This formula is from the AVR datasheet. It calculates the value to put in the UBRR0H and UBRR0L registers to set the baud rate to 9600. The formula is (F_CPU / (16 * baud)) - 1, where F_CPU is the clock frequency of the microcontroller (16MHz in this case) and baud is the desired baud rate (9600 in this case). To adjust the baud rate speed, simply change 9600.
+	uint16_t ubrr = 16000000 / (16 * 9600) - 1;
+	//This sets the low and high bytes of the UBRR0 register. It is necessary to set them in this manner because sometimes ubrr is greater than 255, which is the maximum value that can be stored in an 8-bit register. By shifting ubrr to the right by 8 bits, we get the high byte, and by casting ubrr to uint8_t, we get the low byte.
+	UBRR0H = (uint8_t)(ubrr >> 8);
+	UBRR0L = (uint8_t)ubrr;
+
+	//This enables the receiver and transmitter by setting the RXEN0 and TXEN0 bits in the UCSR0B register. This switches a multiplexer that links the serial functions to the pins, allowing us to use the TX and RX pins for serial communication instead of digital IO.
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); //This sets the frame format to 8 data bits, no parity, and 1 stop bit by setting the USBS0, UCSZ01, and UCSZ00 bits in the UCSR0C register. This is a common frame format for serial communication.
+
+}
+
+void serialPrintChar(char c){
+	while (!(UCSR0A & (1 << UDRE0))); //Wait until the transmit buffer is empty by checking the UDRE0 bit in the UCSR0A register. This ensures that we don't overwrite any data that is currently being transmitted.
+	UDR0 = c; //Put the character to be transmitted into the UDR0 register, which is the transmit buffer. This starts the transmission of the character.
+}
+
 inline bool myDigitalRead(const PinStruct target){
 	return *target.pin & (1 << target.bit);
 }
