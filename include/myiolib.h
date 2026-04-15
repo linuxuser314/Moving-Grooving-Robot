@@ -61,8 +61,8 @@ constexpr uint8_t IN = 0;
 constexpr uint8_t OUT = 1;
 
 void initSerial9600(void){
-	//This formula is from the AVR datasheet. It calculates the value to put in the UBRR0H and UBRR0L registers to set the baud rate to 9600. The formula is (F_CPU / (16 * baud)) - 1, where F_CPU is the clock frequency of the microcontroller (16MHz in this case) and baud is the desired baud rate (9600 in this case). To adjust the baud rate speed, simply change 9600.
-	uint16_t ubrr = 16000000 / (16 * 9600) - 1;
+	//This formula is from the AVR datasheet. It calculates the value to put in the UBRR0H and UBRR0L registers to set the baud rate to 9600. The formula is (F_CPU / (16 * baud)) - 1, where F_CPU is the clock frequency of the microcontroller (16MHz in this case) and baud is the desired baud rate (9600 in this case). To adjust the baud rate speed, simply change 9600. the UL is necessary to tell the compiler that these are unsigned long constants, which is important for the calculation to work correctly.
+	uint16_t ubrr = 16000000UL / (16UL * 9600UL) - 1;
 	//This sets the low and high bytes of the UBRR0 register. It is necessary to set them in this manner because sometimes ubrr is greater than 255, which is the maximum value that can be stored in an 8-bit register. By shifting ubrr to the right by 8 bits, we get the high byte, and by casting ubrr to uint8_t, we get the low byte.
 	UBRR0H = (uint8_t)(ubrr >> 8);
 	UBRR0L = (uint8_t)ubrr;
