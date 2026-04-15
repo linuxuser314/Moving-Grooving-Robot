@@ -61,55 +61,55 @@ constexpr uint8_t IN = 0;
 constexpr uint8_t OUT = 1;
 
 inline bool myDigitalRead(const PinStruct target){
-  return *target.pin & (1 << target.bit);
+	return *target.pin & (1 << target.bit);
 }
 inline void myPinMode(const PinStruct target, bool mode){
-  if(mode)	*target.ddr |= (1 << target.bit);
-  else	*target.ddr &= ~(1 << target.bit);
+	if(mode)	*target.ddr |= (1 << target.bit);
+	else	*target.ddr &= ~(1 << target.bit);
 }
 inline void myDigitalWrite(const PinStruct target, bool level){
-  if(level)	*target.port |= (1 << target.bit);
+ 	if(level)	*target.port |= (1 << target.bit);
   else  *target.port &= ~(1 << target.bit);
 }
 inline void myAnalogWrite(const PinStruct target, uint8_t level){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.PWMPtr = level;
-    }
+	if(target.PWMData.timer != nullptr){
+		*target.PWMData.PWMPtr = level;
+	}
 }
 
 
 inline void enablePWM(const PinStruct target){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.timer |= (1 << target.PWMData.modeBit);
-    }
+	if(target.PWMData.timer != nullptr){
+        	*target.PWMData.timer |= (1 << target.PWMData.modeBit);
+	}
 }
 inline void disablePWM(const PinStruct target){
-    if(target.PWMData.timer != nullptr){
-        *target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
-    }
+	if(target.PWMData.timer != nullptr){
+		*target.PWMData.timer &= ~(1 << target.PWMData.modeBit);
+    	}
 }
 
 
 //defines the functions necessary for setting up, running, and updating myMillis().
 volatile unsigned long systemMillis = 0;
 ISR(TIMER2_COMPA_vect){
-  systemMillis ++;
+	systemMillis ++;
 }
 inline unsigned long myMillis(void){
-  unsigned long time;
-  cli();
-  time = systemMillis;
-  sei();
-  return time;
+	unsigned long time;
+	cli();
+	time = systemMillis;
+	sei();
+	return time;
 }
 inline void initTimer2Millis(void){
-  //Inititate Timer2 for myMillis()
-  TCCR2A = (1 << WGM21);
-  TCCR2B = (1 << CS22);
-  OCR2A = 249;
-  TIMSK2 = (1 << OCIE2A);
+	//Inititate Timer2 for myMillis()
+	TCCR2A = (1 << WGM21);
+	TCCR2B = (1 << CS22);
+	OCR2A = 249;
+	TIMSK2 = (1 << OCIE2A);
 
-  sei();
+	sei();
 }
 
 //this initiates Timer0 PWM for pins 5 and 6.
@@ -148,21 +148,21 @@ inline void initTimer1Servo50Hz(void){
 
 }
 
+
 //Primary robot drive function
 inline void drive(int16_t left, int16_t right){
-	//Drives the robot.
-	//It starts by taking 3000 (1.5ms).
-	//Then it takes the left and right variables (which range from -100 to 100) and multiplies them by 4.
-	//This gives us a range from -400 to 400.
-	//Adding them to the 3000 gives us a range from 2600 to 3400, or 1.3ms to 1.7ms to control the servos.
-	//The right motor is reversed because of the way it is oriented on the robot.
-	//OCR1A = 3000 + (uint16_t)left * 4;
-	//OCR1B = 3000 - (uint16_t)right * 4;
-    OCR1B = (uint16_t)right * 2;
-    OCR1A = (uint16_t)left * 2;
+	//Drives the robot. It starts by taking 3000 (1.5ms). Then it takes the left and right variables (which range from -100 to 100) and multiplies them by 4.This gives us a range from -400 to 400. Adding them to the 3000 gives us a range from 2600 to 3400, or 1.3ms to 1.7ms to control the servos. The right motor is reversed because of the way it is oriented on the robot.
+	OCR1A = 3000 + (uint16_t)left * 4;
+	OCR1B = 3000 - (uint16_t)right * 4;
 }
 
+//drive(0,0) is used so often that I made a stop function for it.
+inline void stop(void){
+	drive(0,0);
+}
+
+//This is a simple blocking delay function. It functions identically to Arduio's delay() function.
 inline void myDelay(unsigned long ms){
-    unsigned long startTime = myMillis();
-    while(myMillis() - startTime < ms);
+	unsigned long startTime = myMillis();
+	while(myMillis() - startTime < ms);
 }
