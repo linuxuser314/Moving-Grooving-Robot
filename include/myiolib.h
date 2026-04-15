@@ -150,10 +150,15 @@ inline void initTimer1Servo50Hz(void){
 
 
 //Primary robot drive function
-inline void drive(int16_t left, int16_t right){
+inline void drive(int8_t left, int8_t right){
 	//Drives the robot. It starts by taking 3000 (1.5ms). Then it takes the left and right variables (which range from -100 to 100) and multiplies them by 4.This gives us a range from -400 to 400. Adding them to the 3000 gives us a range from 2600 to 3400, or 1.3ms to 1.7ms to control the servos. The right motor is reversed because of the way it is oriented on the robot.
 	OCR1A = 3000 + (uint16_t)left * 4;
 	OCR1B = 3000 - (uint16_t)right * 4;
+}
+inline void millisDrive(int16_t left, int16_t right){
+	//This is here if I ever need direct millisecond-level control over the motors.
+	OCR1A = left * 2;
+	OCR1B = right * 2;
 }
 
 //drive(0,0) is used so often that I made a stop function for it.
