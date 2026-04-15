@@ -6,20 +6,27 @@
 
 #include "myiolib.h"
 
+void testDrive(int l, int r){
+	drive(l, r);
+	myDelay(1000);
+	drive(1500, 1500);
+	myDelay(5000);
+	drive(l, r);
+	myDelay(1000);
+	drive(1500, 1500);
+	myDelay(5000);
+	drive(l, r);
+	myDelay(1000);
+	drive(1500, 1500);
+	myDelay(5000);
+}
 int main(void){
-  //This is where I put the code.
 
-  myPinMode(PIN_5, OUT);
-  myPinMode(PIN_6, OUT);
-
-  initTimer2Millis();
-
-  while(true){
-    myDigitalWrite(PIN_5, ON);
-    myDigitalWrite(PIN_6, OFF);
-    myDelay(1000);
-    myDigitalWrite(PIN_5, OFF);
-    myDigitalWrite(PIN_6, ON);
-    myDelay(1000);
-  }
+	initTimer2Millis();
+	initTimer1Servo50Hz();
+	testDrive(1700, 1300);
+	testDrive(1300, 1700);
+	testDrive(1700, 1700);
+	testDrive(1300, 1300);
+	while(true);
 }
