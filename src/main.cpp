@@ -6,13 +6,17 @@
 
 #include "myiolib.h"
 
-
+#define METERTIME 6000
+#define TURNTIME 700
 int main(void){
 
 	initTimer2Millis();
 	initTimer1Servo50Hz();
-	initSerial9600();
+
 	while(true){
-		serialPrintChar((char)(65 + myMillis() % 26));
+		drive(100, 100);
+		myDelay(METERTIME);
+		drive(100 ,-100);
+		myDelay(TURNTIME);
 	}
 }
