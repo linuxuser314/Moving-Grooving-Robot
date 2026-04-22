@@ -121,6 +121,12 @@ inline unsigned long myMillis(void){
 	sei();
 	return time;
 }
+inline unsigned long myMicros(void){
+	cli();
+	uint32_t time = systemMillis * 1000 + TCNT2 * 4;
+	sei();
+	return time;
+}
 inline void initTimer2Millis(void){
 	//Inititate Timer2 for myMillis()
 	TCCR2A = (1 << WGM21);
