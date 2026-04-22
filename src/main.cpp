@@ -17,7 +17,7 @@ int main(void){
 	myPinMode(PIN_2, OUT);
 
 	while(myMillis() < 1000){
-		if(TCNT2 < 127){
+		if((TCNT2 * 4 + myMillis()) % 2272 < 1136){
 			myDigitalWrite(PIN_2, ON);
 		}
 		else{
