@@ -6,17 +6,25 @@
 
 #include "myiolib.h"
 
+constexpr uint8_t TONE_PIN = 2;
+
 #define METERTIME 6000
 #define TURNTIME 700
 int main(void){
 
 	initTimer2Millis();
 	initTimer1Servo50Hz();
+	myPinMode(PIN_2, OUT);
 
+	while(myMillis() < 1000){
+		if(TCNT2 < 127){
+			myDigitalWrite(PIN_2, ON);
+		}
+		else{
+			myDigitalWrite(PIN_2, OFF);
+		}
+		myDigitalWrite(PIN_2, ON);
+	}
 	while(true){
-		drive(100, 100);
-		myDelay(METERTIME);
-		drive(100 ,-100);
-		myDelay(TURNTIME);
 	}
 }
