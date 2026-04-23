@@ -23,7 +23,7 @@ int main(void){
 		else{
 			myDigitalWrite(PIN_2, OFF);
 		}
-		myDigitalWrite(PIN_2, ON);
+		
 	}
 	while(true){
 	}
