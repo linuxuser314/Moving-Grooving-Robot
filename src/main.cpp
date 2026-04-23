@@ -16,15 +16,14 @@ int main(void){
 	initTimer1Servo50Hz();
 	myPinMode(PIN_2, OUT);
 
-	while(myMillis() < 1000){
-		if(myMicros() % (1000000UL / 440) < (1000000UL / 440) / 2){
-			myDigitalWrite(PIN_2, ON);
-		}
-		else{
-			myDigitalWrite(PIN_2, OFF);
-		}
-		
-	}
+	myTone(1047, 500);
+	myTone(1147, 500);
+	myTone(1319, 500);
+	myTone(1397, 500);
+	myTone(1568, 500);
+	myTone(1760, 500);
+	myTone(1976, 500);
+	myTone(2093, 500);
 	while(true){
 	}
 }

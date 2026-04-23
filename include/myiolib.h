@@ -123,7 +123,7 @@ inline unsigned long myMillis(void){
 }
 inline unsigned long myMicros(void){
 	cli();
-	uint32_t time = systemMillis * 1000 + TCNT2 * 4;
+	uint32_t time = systemMillis * 1000UL + TCNT2 * 4;
 	sei();
 	return time;
 }
@@ -173,6 +173,19 @@ inline void initTimer1Servo50Hz(void){
 
 }
 
+//Blocking tone function
+inline void myTone(uint16_t freq, uint16_t duration){
+	uint32_t startTime = myMillis();
+	while(myMillis() - startTime < duration){
+		if(myMicros() % (1000000UL / freq) < (1000000UL / freq) / 2){
+			myDigitalWrite(PIN_2, ON);
+		}
+		else{
+			myDigitalWrite(PIN_2, OFF);
+		}
+		
+	}
+}
 
 //Primary robot drive function
 inline void drive(int8_t left, int8_t right){
