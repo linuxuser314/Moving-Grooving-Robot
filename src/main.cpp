@@ -17,12 +17,19 @@ int main(void){
 	myPinMode(PIN_2, OUT);
 
 	myTone(1047, 500);
-	myTone(1147, 500);
+	myDelay(20);
+	myTone(1174, 500);
+	myDelay(20);
 	myTone(1319, 500);
+	myDelay(20);
 	myTone(1397, 500);
+	myDelay(20);
 	myTone(1568, 500);
+	myDelay(20);
 	myTone(1760, 500);
+	myDelay(20);
 	myTone(1976, 500);
+	myDelay(20);
 	myTone(2093, 500);
 	while(true){
 	}

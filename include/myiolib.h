@@ -175,16 +175,23 @@ inline void initTimer1Servo50Hz(void){
 
 //Blocking tone function
 inline void myTone(uint16_t freq, uint16_t duration){
-	uint32_t startTime = myMillis();
-	while(myMillis() - startTime < duration){
-		if(myMicros() % (1000000UL / freq) < (1000000UL / freq) / 2){
+	uint32_t startTime = myMillis() * 1000UL;
+	uint32_t currentTime = startTime;
+	uint32_t period = 1000000UL / freq;
+	duration *= 1000UL;
+
+	while(currentTime - startTime < duration){
+		if(currentTime % period < period / 2){
 			myDigitalWrite(PIN_2, ON);
 		}
 		else{
 			myDigitalWrite(PIN_2, OFF);
 		}
-		
+		cli();
+		currentTime = systemMillis * 1000UL + TCNT2 * 4;
+		sei();
 	}
+	myDigitalWrite(PIN_2, OFF);
 }
 
 //Primary robot drive function
