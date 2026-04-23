@@ -24,9 +24,9 @@ int main(void){
 	myDelay(6000);
 	stop();
 	myDelay(2000);
-	drive(-30, 30);
+	drive(-25, 25);
 	myDelay(1000);
-	drive(30, -30);
+	drive(25, -25);
 	myDelay(1000);
 	drive(-100, -100);
 	myDelay(6000);
