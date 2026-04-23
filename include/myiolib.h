@@ -1,18 +1,24 @@
-//myiolib.h library header file version 1.0
-//This library was created by Creed Truman.
-//It was created for Sudeepa Pathak's EGR-150-AF01 Class in Spring 2026.
-//This library is licensed under the MIT License.
-//This version was last updated on 4/14/2026.
+/**********************************************
+myiolib.h library header file version 1.0
+This library was created by Creed Truman.
+It was created for Sudeepa Pathak's EGR-150-AF01 Class in Spring 2026.
+This library is licensed under the MIT License.
+This version was last updated on 4/22/2026.
 
-//Credit to Google Gemini for helping me debug and optimize the code, for explaining AVR architecture, and helping me get started with VSCode.
+Credit to Google Gemini for helping me debug and optimize the code, for explaining AVR architecture, and helping me get started with VSCode.
 
 
-//This library is designed to provide basic IO functions, pin definitions, and timer setup for AVR microcontrollers.
-//It is one of my first attemps at writing a C library.
-//It is not fully functional by any means.
+This library is designed to provide basic IO functions, pin definitions, and timer setup for AVR microcontrollers.
+It is one of my first attemps at writing a C library.
+It is not fully functional by any means.
 
-//TODO:
-//Add serial IO functions
+TODO:
+Add better serial IO functions
+Consider pivoting to using OOP for better code organization and readability.
+For example, using LED_1.on(), .off(), .toggle(), .mode(), .read(), etc.
+This would also allow me to also have seperate objects for different pin types which may reduce compiler errors
+*/
+
 
 //This is necessary for IO port definitions, interrupt handling, and uint8_t
 #include <avr/io.h>
@@ -174,7 +180,7 @@ inline void initTimer1Servo50Hz(void){
 }
 
 //Blocking tone function
-inline void myTone(uint16_t freq, uint16_t duration){
+inline void myTone(uint16_t freq, uint32_t duration){
 	uint32_t startTime = myMillis() * 1000UL;
 	uint32_t currentTime = startTime;
 	uint32_t period = 1000000UL / freq;
@@ -187,9 +193,7 @@ inline void myTone(uint16_t freq, uint16_t duration){
 		else{
 			myDigitalWrite(PIN_2, OFF);
 		}
-		cli();
-		currentTime = systemMillis * 1000UL + TCNT2 * 4;
-		sei();
+		currentTime = myMicros();
 	}
 	myDigitalWrite(PIN_2, OFF);
 }
